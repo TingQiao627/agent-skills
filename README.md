@@ -364,3 +364,5 @@ See [docs/skill-anatomy.md](docs/skill-anatomy.md) for the format specification 
 ## License
 
 MIT - use these skills in your projects, teams, and tools.
+
+test auto cr
