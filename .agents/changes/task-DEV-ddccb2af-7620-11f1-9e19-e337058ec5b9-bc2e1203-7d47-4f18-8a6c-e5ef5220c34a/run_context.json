@@ -1,0 +1,11 @@
+{
+  "task_id": "DEV-ddccb2af-7620-11f1-9e19-e337058ec5b9",
+  "task_boundary_id": "tb-713719d7c40844db",
+  "stage": "review",
+  "blocker_count": 0,
+  "major_issues_count": 2,
+  "minor_issues_count": 2,
+  "review_status": "passed",
+  "review_summary": "代码评审通过。架构设计符合插件式要求，需求覆盖完整。建议解决目录重复问题和补充性能测试文档后合并。",
+  "reviewed_at": "2026-07-14T09:09:50Z"
+}
