@@ -54,22 +54,45 @@ description: Use when user requests test report generation, parsing test results
 - **pytest**: 检测 `pytest.ini`、`pyproject.toml` [tool.pytest]
 - **JUnit XML**: 通用兜底，检测 `*.xml` 文件
 
+**配置文件解析逻辑：**
+
+| 配置文件 | 解析方式 | 测试命令提取 |
+|---------|---------|-------------|
+| `package.json` | JSON 解析 | `scripts.test` 字段值 |
+| `pyproject.toml` | TOML 解析 | `[tool.pytest]` 配置或 `pytest` 命令 |
+| `Cargo.toml` | TOML 解析 | `[scripts.test]` 或 `cargo test` |
+
+**识别失败降级策略：**
+1. 尝试通用命令：`npm test`、`pytest`、`cargo test`
+2. 返回明确错误：提供支持的框架列表和手动指定方式
+3. 不生成空报告，返回诊断信息
+
 ### Step 3: 测试执行（执行模式）
 
-**Jest 命令：**
+**Jest 命令（含覆盖率）：**
 ```bash
-jest --json --outputFile=jest-output.json --testLocationInResults
+jest --json --outputFile=jest-output.json --testLocationInResults --coverage --coverageReporters=json
 ```
+覆盖率数据位于 `jest-output.json` 的 `coverageMap` 字段
 
-**Vitest 命令：**
+**Vitest 命令（含覆盖率）：**
 ```bash
-vitest run --reporter=json --outputFile=vitest-output.json
+vitest run --reporter=json --outputFile=vitest-output.json --coverage
 ```
+需配置 `vitest.config.ts` 中 `coverage.provider: 'v8'` 或 `'istanbul'`
 
-**pytest 命令：**
+**pytest 命令（含覆盖率）：**
 ```bash
-pytest --junit-xml=pytest-results.xml
+pytest --junit-xml=pytest-results.xml --cov --cov-report=json
 ```
+需要安装 `pytest-cov` 插件
+
+**覆盖率配置行为：**
+| coverage 值 | 行为 |
+|------------|------|
+| `auto` | 自动检测覆盖率工具，存在则启用 |
+| `on` | 强制启用覆盖率，缺失时报错 |
+| `off` | 跳过覆盖率收集 |
 
 **错误处理：**
 - 命令不存在 → 返回明确诊断信息，不生成空报告
@@ -82,7 +105,25 @@ pytest --junit-xml=pytest-results.xml
 2. 内容嗅验确认格式
 3. 调用对应解析器
 
-**解析器接口：**
+**解析器接口定义：**
+
+**1. TestResultParser 接口（插件式架构）：**
+```typescript
+interface TestResultParser {
+  name: string;                              // 解析器名称（如 'jest', 'vitest'）
+  supportedFormats: string[];                // 支持的文件格式（如 ['.json', '.xml']）
+  priority: number;                          // 优先级（数字越小优先级越高）
+  canParse(filePath: string, content: string): boolean;  // 判断是否能解析
+  parse(content: string): ParsedTestResult;  // 解析逻辑
+}
+```
+
+**解析器注册与发现机制：**
+- 解析器按优先级排序，优先使用高优先级解析器
+- 检测顺序：文件扩展名 → canParse 嗅验 → 调用 parse
+- 解析失败时降级至下一个解析器（如果存在）
+
+**2. ParsedTestResult 接口：**
 ```typescript
 interface ParsedTestResult {
   summary: {
@@ -120,6 +161,26 @@ interface ParsedTestResult {
   };
 }
 ```
+
+**3. 安全过滤机制（敏感信息保护）：**
+
+在解析结果后执行以下安全过滤：
+
+| 过滤类型 | 正则规则 | 替换为 |
+|---------|---------|--------|
+| 环境变量 | `process\.env\.[A-Z_]+` | `[ENV_VAR]` |
+| 密钥标识 | `(password|secret|token|key|auth)[\"']?\\s*[:=]\\s*[\"']?[^,}\"'\\s]+` | `[REDACTED]` |
+| 敏感路径 | `/home/[^/]+|/Users/[^/]+|C:\\Users\\[^\\]+` | `[HOME]` |
+| API Keys | `(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36})` | `[API_KEY]` |
+
+**堆栈信息清洗：**
+- 过滤包含 `node_modules` 的路径
+- 过滤包含 `.env`、`config` 的文件路径
+- 截断堆栈至关键 20 行（保留最相关的错误上下文）
+
+**命令注入防护：**
+- 禁止 `test_command` 参数包含 shell 元字符：`|`, `;`, `&`, `$`, `` ` ``, `(`, `)`, `{`, `}`, `<`, `>`
+- 使用参数化执行而非字符串拼接
 
 ### Step 5: 报告生成
 
