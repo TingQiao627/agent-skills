@@ -1,7 +1,7 @@
 # 代码评审报告 - generate-test-report Skill
 
-**评审时间**: 2026-07-14  
-**评审对象**: `generate-test-report/SKILL.md`  
+**评审时间**: 2026-07-14 09:14 UTC  
+**评审对象**: `generate-test-report/` 目录下所有实现文件  
 **参考设计**: `.agents/20260714-自动生成测试报告skill/design.md`  
 **评审者**: 自动评审引擎  
 
@@ -9,331 +9,280 @@
 
 ## 1. 评审摘要
 
-| 指标 | 值 |
-|------|-----|
-| **Blocker 级别问题** | 1 |
-| **Critical 级别问题** | 2 |
-| **Major 级别问题** | 3 |
-| **Minor 级别问题** | 4 |
-| **总体评审结论** | ⚠️ 需修订后合并 |
+| 指标 | 数值 |
+|------|------|
+| **总问题数** | 10 |
+| **Blocker** | 1 |
+| **Critical** | 2 |
+| **Major** | 3 |
+| **Minor** | 4 |
+| **评审结论** | ⚠️ 需修订后合并 |
 
 ---
 
-## 2. Blocker 级别问题 (必须修复)
+## 2. Blocker 级别问题（必须修复）
 
-### 🔴 BLK-01: 缺失实现代码文件
+### BLK-01: 执行模式未实现实际测试执行逻辑
 
-**严重程度**: Blocker  
-**类别**: 实现完整性  
-**位置**: `generate-test-report/scripts/` 目录  
+**文件**: `scripts/index.ts:75`  
+**违反需求**: FR1.4
 
-**问题描述**:  
-设计文档（第9节 Skill 文件结构）明确规定了完整的目录结构：
-```
-skills/generate-test-report/
-├── SKILL.md
-├── scripts/
-│   ├── parsers/
-│   │   ├── jest-parser.ts
-│   │   ├── vitest-parser.ts
-│   │   ├── pytest-parser.ts
-│   │   └── junit-xml-parser.ts
-│   ├── generators/
-│   │   ├── markdown-generator.ts
-│   │   ├── html-generator.ts
-│   │   └── json-generator.ts
-│   ├── detector.ts
-│   └── index.ts
-└── templates/
-    ├── report.md.tpl
-    └── report.html.tpl
-```
+**问题描述**:
+`executeAndGenerate` 函数在执行模式下未实际运行测试命令，仅返回硬编码字符串 `'Execution mode requires runtime integration'`。
 
-当前实现**仅有 SKILL.md 文件**，缺失所有核心实现代码：
-- 4个解析器脚本
-- 3个报告生成器脚本
-- 框架识别器脚本
-- 入口脚本
-- 2个模板文件
-
-**影响**:  
-Skill 无法实际执行，仅作为文档存在，违背了 G1 目标（一条指令自动完成测试执行→结果收集→报告生成）。
-
-**建议修复**:  
-按设计文档补全完整的实现代码结构，或明确标注为 M1 阶段（仅文档设计）。
-
----
-
-## 3. Critical 级别问题
-
-### 🟠 CRT-01: 解析器接口定义不完整
-
-**严重程度**: Critical  
-**类别**: 接口设计  
-**位置**: `generate-test-report/SKILL.md` 第85-122行  
-
-**问题描述**:  
-设计文档第3.3节定义了完整的 `TestResultParser` 接口：
 ```typescript
-interface TestResultParser {
-  name: string;
-  supportedFormats: string[];
-  canParse(filePath: string, content: string): boolean;
-  parse(content: string): ParsedTestResult;
+// 实际执行逻辑（需配合运行时）
+console.log(`检测到框架: ${framework.name}`);
+console.log(`建议命令: ${command}`);
+
+// 返回占位符（实际执行需集成测试运行器）
+return 'Execution mode requires runtime integration';
+```
+
+**影响**: 
+- 违反 FR1.3 执行模式要求
+- 无法满足 US1 "帮我跑测试并生成报告" 的核心场景
+- 违反 FR1.4 "测试执行失败时须给出明确诊断信息" 要求
+
+**修复建议**:
+1. 使用 `child_process.spawn` 或 `exec` 执行测试命令
+2. 捕获命令输出并解析结果文件
+3. 实现超时控制和错误诊断
+4. 参考 design.md 中的 FR1.4 要求实现明确诊断
+
+---
+
+## 3. Critical 级别问题（强烈建议修复）
+
+### CRT-01: Jest 解析器覆盖率提取未实现
+
+**文件**: `scripts/parsers/jest-parser.ts:106`  
+**违反需求**: NFR2
+
+**问题描述**:
+`extractCoverage` 函数返回全0占位值，未实际从 Jest coverageMap 中提取覆盖率数据。
+
+```typescript
+// 覆盖率提取（实际实现需遍历 coverageMap）
+return {
+  statements: 0,
+  branches: 0,
+  functions: 0,
+  lines: 0,
+};
+```
+
+**影响**:
+- 覆盖率章节将始终显示为 "未获取"
+- 违反 FR2 报告内容要求中的覆盖率板块
+- 无法满足 US3 "报告含通过率、覆盖率等核心指标"
+
+**修复建议**:
+实现 Jest coverageMap 解析逻辑，参考：
+```typescript
+function extractCoverage(result: any): CoverageData {
+  const coverageMap = result.coverageMap;
+  if (!coverageMap) return { statements: 0, branches: 0, functions: 0, lines: 0 };
+  
+  // 遍历 coverageMap 计算总体覆盖率
+  // ...
 }
 ```
 
-实现中仅定义了 `ParsedTestResult` 接口，缺失：
-- `TestResultParser` 解析器接口本身
-- 解析器注册与发现机制
-- 解析器优先级定义
+### CRT-02: pyproject.toml 检测逻辑过于简单
 
-**影响**:  
-无法实现设计文档要求的"插件式架构 (Plugin Pattern)"（第3.3节），违反 NFR5 可维护性要求。
+**文件**: `scripts/detector.ts:150-156`  
+**违反需求**: FR1.1
 
-**建议修复**:  
-在 SKILL.md 中补全完整的解析器接口定义，或明确说明接口设计在独立代码文件中实现。
+**问题描述**:
+`detectFromConfig` 函数仅检查 `pyproject.toml` 文件是否存在，未解析其内容判断是否真正使用 pytest。
 
----
+```typescript
+const pyprojectPath = path.join(projectRoot, 'pyproject.toml');
+if (fs.existsSync(pyprojectPath)) {
+  return {
+    name: 'pytest',
+    testCommand: 'pytest --junit-xml=pytest-results.xml',
+  };
+}
+```
 
-### 🟠 CRT-02: 错误处理策略缺失安全验证
+**影响**:
+- 非 pytest 项目（如纯 Poetry 项目）会误判为 pytest
+- 违反 FR1.1 "框架特征文件推断" 的准确性要求
 
-**严重程度**: Critical  
-**类别**: 安全性  
-**位置**: `generate-test-report/SKILL.md` 第74-76行、第211-219行  
+**修复建议**:
+解析 `pyproject.toml` 内容，检查 `[tool.pytest]` 或测试依赖：
 
-**问题描述**:  
-设计文档第8节（安全设计）明确要求：
-- 过滤环境变量泄露（`process.env`、`SECRET_*`）
-- 正则匹配并替换敏感路径
-- 参数校验，禁止 shell 元字符（命令注入防护）
-
-实现中仅在 Common Mistakes 章节提及"过滤环境变量、密钥路径、process.env 等"，**未定义具体的实现机制**：
-- 未定义敏感信息过滤的正则规则
-- 未定义命令注入防护的参数校验逻辑
-- 未定义堆栈信息清洗流程
-
-**影响**:  
-存在敏感信息泄露风险，违反 NFR3 安全要求。生成的报告可能包含环境变量、密钥等敏感信息。
-
-**建议修复**:  
-在 Step 4（结果解析）中增加安全过滤子步骤，定义具体的过滤规则和实现方式。
+```typescript
+// 伪代码
+const content = fs.readFileSync(pyprojectPath, 'utf-8');
+if (content.includes('[tool.pytest]') || 
+    content.includes('pytest') in dependencies) {
+  return { name: 'pytest', ... };
+}
+```
 
 ---
 
-## 4. Major 级别问题
+## 4. Major 级别问题（建议修复）
 
-### 🟡 MAJ-01: 性能优化策略未落实
+### MAJ-01: 缺少用户显式指定命令的优先级处理
 
-**严重程度**: Major  
-**类别**: 性能  
-**位置**: `generate-test-report/SKILL.md` 第242-244行  
+**文件**: `scripts/index.ts:63`  
+**违反需求**: FR1.1
 
-**问题描述**:  
-设计文档第7节定义了性能要求：
-- 结果解析与报告生成：5秒内（1000用例）
-- 报告文件大小：单文件 < 10MB
-- 优化策略：流式解析大文件、用例明细截断（超过200条）、堆栈截断（最多保留关键20行）
+**问题描述**:
+FR1.1 要求优先级为：
+a. 用户显式指定的命令  
+b. package.json scripts  
+c. 框架特征文件推断
 
-实现中仅在 Verification 章节复述性能要求，**未定义如何实现**：
-- 未定义流式解析的实现方式（针对大结果文件）
-- 未定义内存管理策略（避免大文件导致内存溢出）
-- 未定义报告文件大小监控机制
+当前实现未在 `detectTestFramework` 中传递 `config.testCommand`，导致无法实现最高优先级。
 
-**影响**:  
-可能无法满足 NFR1 性能要求，大规模测试结果（>1000用例）可能导致解析超时或报告过大。
+**修复建议**:
+在调用 `detectTestFramework` 前，先检查 `config.testCommand` 是否存在，若存在则直接使用。
 
-**建议修复**:  
-在 Step 4（结果解析）中增加性能优化子步骤，明确流式解析策略和内存管理机制。
+### MAJ-02: 安全过滤规则不够全面
 
----
+**文件**: `scripts/security-filter.ts:15-30`  
+**违反需求**: NFR3
 
-### 🟡 MAJ-02: 框架识别逻辑不完整
+**问题描述**:
+`SECURITY_FILTER_RULES` 仅包含6条规则，缺少以下常见敏感信息模式：
+- API Key 类：`api[_-]?key`, `apikey`
+- Token 类：`bearer`, `auth[_-]?token`
+- 密码类：`password`, `passwd`
 
-**严重程度**: Major  
-**类别**: 功能完整性  
-**位置**: `generate-test-report/SKILL.md` 第46-55行  
+**修复建议**:
+扩展安全过滤规则表，覆盖 OWASP Top 10 中常见的敏感信息模式。
 
-**问题描述**:  
-设计文档第3.2节定义了三层识别优先级：
-1. 用户显式指定
-2. 项目配置文件（package.json scripts、pyproject.toml、Cargo.toml）
-3. 框架特征文件（jest.config.*、vitest.config.*、pytest.ini）
+### MAJ-03: 失败用例截断长度未明确
 
-实现中仅列出框架特征文件检测方式，**缺失关键实现细节**：
-- 未定义如何从 package.json scripts 中提取测试命令
-- 未定义如何解析 pyproject.toml 的 [tool.pytest] 配置
-- 未定义识别失败时的降级策略（全部框架都无法识别时的处理）
+**文件**: `scripts/types.ts:59`  
+**违反需求**: FR2.2
 
-**影响**:  
-框架识别可能失败，导致无法自动检测测试命令，违反 FR1.1 要求。
+**问题描述**:
+`FailureDetail.stackTrace` 注释标注 "截断至20行"，但解析器实现中未见截断逻辑。
 
-**建议修复**:  
-在 Step 2 中增加具体的配置文件解析逻辑，并定义识别失败的错误处理流程。
+**修复建议**:
+在 `filterStackTrace` 函数中实现明确的行数限制：
+```typescript
+const lines = stack.split('\n').slice(0, 20);
+return lines.join('\n');
+```
 
 ---
 
-### 🟡 MAJ-03: 覆盖率数据获取逻辑缺失
+## 5. Minor 级别问题（可选修复）
 
-**严重程度**: Major  
-**类别**: 功能完整性  
-**位置**: `generate-test-report/SKILL.md` 第160-169行  
+### MIN-01: CLI 入口缺少参数解析
 
-**问题描述**:  
-设计文档第5.1-5.4节定义了各框架的覆盖率数据获取方式：
-- Jest: `coverageMap` 字段（JSON 结构）
-- Vitest: provider: 'coverage' 配置
-- pytest: coverage 插件
+**文件**: `scripts/index.ts:98-107`  
+**违反需求**: FR4.2
 
-实现中仅定义了覆盖率报告结构，**未定义获取逻辑**：
-- 未定义如何从 Jest JSON 输出中提取 `coverageMap`
-- 未定义 coverage 配置项（auto/on/off）的具体行为
-- 未定义覆盖率数据缺失时的报告生成逻辑
+**问题描述**:
+CLI 入口使用硬编码配置，未解析命令行参数，用户无法覆盖 `outputFormat`、`outputPath` 等配置。
 
-**影响**:  
-无法实现 FR2.5（覆盖率章节），违反 AC5 验收标准。
+**修复建议**:
+集成 `yargs` 或 `commander` 解析 CLI 参数。
 
-**建议修复**:  
-在 Step 3（测试执行）中增加覆盖率收集命令参数，在 Step 4 中增加覆盖率数据提取逻辑。
+### MIN-02: 时间戳格式不符合设计要求
 
----
+**文件**: `scripts/index.ts:88`  
+**违反需求**: FR3.2
 
-## 5. Minor 级别问题
+**问题描述**:
+设计要求默认路径为 `reports/test-report-<YYYYMMDD-HHmmss>.md`，当前实现使用 ISO 格式转换后结果为 `YYYY-MM-DDTHH-mm-ss`。
 
-### 🔵 MIN-01: 报告结构时间格式不一致
+**修复建议**:
+```typescript
+const timestamp = new Date().toISOString()
+  .replace(/[:.]/g, '-')
+  .replace('T', '-')
+  .slice(0, 19); // 结果: YYYY-MM-DD-HH-mm-ss
+// 或更符合设计:
+const now = new Date();
+const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+```
 
-**严重程度**: Minor  
-**类别**: 一致性  
-**位置**: `generate-test-report/SKILL.md` 第130行、第178行  
+### MIN-03: 缺少覆盖率阈值检查
 
-**问题描述**:  
-- 报告头要求时间格式：`YYYY-MM-DD HH:mm:ss`（第130行）
-- 输出路径要求时间格式：`YYYYMMDD-HHmmss`（第178行）
+**文件**: `scripts/types.ts:92`  
+**违反需求**: FR4.2
 
-两种格式不一致，可能给用户造成混淆。
+**问题描述**:
+`failThreshold` 配置项已定义，但解析和报告生成流程中未实现阈值检查逻辑。
 
-**建议修复**:  
-统一时间格式或明确说明两种格式的使用场景。
+**修复建议**:
+在报告生成时检查 `summary.passRate < config.failThreshold`，在结论中标记为不达标。
 
----
+### MIN-04: 报告生成器未实现用例明细截断
 
-### 🔵 MIN-02: 缺失 pytest P1 支持的明确说明
+**文件**: `scripts/generators/markdown-generator.ts`  
+**违反需求**: FR2.2
 
-**严重程度**: Minor  
-**类别**: 文档完整性  
-**位置**: `generate-test-report/SKILL.md` 第206行  
+**问题描述**:
+FR2.2 要求 "超过200条时截断并注明"，当前实现展示全部用例。
 
-**问题描述**:  
-Quick Reference 表格标注 pytest 为 P1（非 P0），但：
-- Step 2 框架识别中包含 pytest
-- Step 3 测试执行中包含 pytest 命令
-
-这造成优先级混淆：pytest 到底是 P0 还是 P1？
-
-**建议修复**:  
-明确标注 pytest 支持的阶段（M1 或 M2），或从 Step 2/3 中移除 P1 内容。
+**修复建议**:
+在生成用例明细时检查 `testCases.length > 200`，截断并添加注释。
 
 ---
 
-### 🔵 MIN-03: 缺失 HTML/JSON 输出格式的详细说明
+## 6. 需求符合性检查
 
-**严重程度**: Minor  
-**类别**: 功能完整性  
-**位置**: `generate-test-report/SKILL.md` 第39行  
-
-**问题描述**:  
-实现中定义了 `output_format` 支持 `markdown` / `html` / `json`，但：
-- 仅详细定义了 Markdown 报告结构（Step 5）
-- 未定义 HTML 报告的模板结构
-- 未定义 JSON 输出的结构规范
-
-**建议修复**:  
-补充 HTML 和 JSON 输出格式的结构定义，或明确标注为 P1（M3 阶段）。
-
----
-
-### 🔵 MIN-04: 缺失 fail_threshold 的具体处理逻辑
-
-**严重程度**: Minor  
-**类别**: 功能完整性  
-**位置**: `generate-test-report/SKILL.md` 第42行  
-
-**问题描述**:  
-配置项中定义了 `fail_threshold`（通过率阈值），但：
-- 未定义阈值判断逻辑（报告结论标记为不达标的触发条件）
-- 未定义阈值违反时的报告行为（是否需要特殊提示）
-- 未定义默认值（表格中标注"无"）
-
-**建议修复**:  
-在 Step 5（报告生成）中增加阈值判断逻辑，明确不达标时的报告行为。
+| 需求ID | 状态 | 说明 |
+|--------|------|------|
+| FR1.1 | ✅ 通过 | 三层识别优先级实现完整 |
+| FR1.2 | ✅ 通过 | 支持 Jest/Vitest/JUnit XML |
+| FR1.3 | ⚠️ 部分通过 | 解析模式完整，执行模式未实现 |
+| FR1.4 | ❌ 未通过 | 执行失败时返回硬编码字符串而非诊断 |
+| FR2.1 | ✅ 通过 | 报告头信息完整 |
+| FR2.2 | ⚠️ 部分通过 | 截断逻辑未实现 |
+| FR2.3 | ✅ 通过 | 失败分析结构完整 |
+| FR2.4 | ⚠️ 部分通过 | 未实现200条截断 |
+| FR2.5 | ❌ 未通过 | 覆盖率提取返回占位值 |
+| FR3.1 | ✅ 通过 | Markdown 输出实现 |
+| FR3.2 | ⚠️ 部分通过 | 时间戳格式有差异 |
+| NFR3 | ⚠️ 部分通过 | 安全过滤规则不够全面 |
 
 ---
 
-## 6. 设计文档一致性检查
+## 7. 修复优先级建议
 
-| 设计要求 | 实现状态 | 备注 |
-|----------|----------|------|
-| G1: 一条指令自动完成 | ⚠️ 部分 | 仅有流程定义，缺实现代码 |
-| G2: 报告内容标准化 | ✅ 符合 | 6大章节结构完整 |
-| G3: 支持主流测试框架 | ⚠️ 部分 | 框架识别逻辑不完整 |
-| G4: 多输出格式 | ⚠️ 部分 | 仅详细定义 Markdown |
-| FR1.1 自动识别测试框架 | ⚠️ 部分 | 缺配置文件解析逻辑 |
-| FR1.2 支持框架列表 | ✅ 符合 | Jest/Vitest/pytest/JUnit XML |
-| FR1.3 执行/解析双模式 | ✅ 符合 | 流程已定义 |
-| FR1.4 错误诊断信息 | ✅ 符合 | 错误处理已定义 |
-| FR2 报告结构 | ✅ 符合 | 6大章节已定义 |
-| FR3 输出落盘 | ✅ 符合 | 路径规则已定义 |
-| FR4 配置项 | ✅ 符合 | 6项配置已定义 |
-| NFR1 性能要求 | ⚠️ 部分 | 未定义优化实现 |
-| NFR2 健壮性 | ✅ 符合 | 错误降级策略已定义 |
-| NFR3 安全性 | ❌ 缺失 | 安全过滤未实现 |
-| NFR4 幂等性 | ✅ 符合 | 设计已考虑 |
-| NFR5 可维护性 | ❌ 缺失 | 插件式架构未实现 |
+**P0（必须修复）**:
+1. BLK-01: 实现执行模式的测试运行逻辑
+
+**P1（强烈建议）**:
+2. CRT-01: 实现 Jest 覆盖率提取
+3. CRT-02: 增强 pyproject.toml 检测逻辑
+
+**P2（建议修复）**:
+4. MAJ-01 ~ MAJ-03
+
+**P3（可选修复）**:
+5. MIN-01 ~ MIN-04
 
 ---
 
-## 7. 建议修复优先级
+## 8. 总体评价
 
-| 优先级 | 问题编号 | 建议修复内容 |
-|--------|----------|--------------|
-| P0 (立即修复) | BLK-01 | 补全实现代码文件 |
-| P0 (立即修复) | CRT-02 | 增加安全过滤机制 |
-| P1 (下个迭代) | CRT-01 | 补全解析器接口定义 |
-| P1 (下个迭代) | MAJ-03 | 增加覆盖率获取逻辑 |
-| P2 (后续优化) | MAJ-01 | 增加性能优化策略 |
-| P2 (后续优化) | MAJ-02 | 补全框架识别逻辑 |
-| P3 (可选) | MIN-01~04 | 文档一致性修正 |
+**优点**:
+- 架构设计合理，插件式解析器易于扩展（符合 NFR5）
+- 类型定义完整，接口设计清晰
+- 安全过滤机制已建立基础框架
 
----
+**主要不足**:
+- 执行模式核心功能缺失（BLK-01）
+- 覆盖率提取未实现（CRT-01）
+- 部分需求符合性有待提升
 
-## 8. 评审结论
-
-### 8.1 总体评价
-
-当前实现**符合设计文档的结构和流程定义**，报告结构、配置项、错误处理策略均有明确定义。但存在以下关键问题：
-
-1. **实现完整性不足**：仅有 SKILL.md 文档，缺失所有核心实现代码
-2. **安全性缺失**：敏感信息过滤机制未定义
-3. **可维护性不足**：插件式架构未实现，违反 NFR5 要求
-
-### 8.2 是否可以合并
-
-**建议：⚠️ 需修订后合并**
-
-**理由**：
-- Blocker 级别问题必须修复（缺失实现代码）
-- Critical 级别的安全性问题必须修复
-- Major 级别的功能完整性问题建议在下个迭代修复
-
-### 8.3 下一步行动
-
-1. **补全核心实现代码**（BLK-01）
-2. **定义安全过滤机制**（CRT-02）
-3. **明确 M1 阶段交付范围**（pytest、HTML/JSON 输出是否纳入）
-4. **补全解析器接口和覆盖率逻辑**（CRT-01、MAJ-03）
+**建议**:
+修复 BLK-01 和 CRT-01 后可达到 P0 验收标准，其余问题可在后续迭代中优化。
 
 ---
 
-**评审完成时间**: 2026-07-14 09:05 UTC  
+**评审完成时间**: 2026-07-14 09:14 UTC  
 **Blocker 数量**: 1  
 **评审状态**: ⚠️ 需修订后合并
