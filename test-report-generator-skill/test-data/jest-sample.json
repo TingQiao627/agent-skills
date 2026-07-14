@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "testResults": [
+    {
+      "name": "utils/format.test.js",
+      "duration": 250,
+      "assertionResults": [
+        {
+          "fullName": "formatDate should format date correctly",
+          "title": "should format date correctly",
+          "status": "passed",
+          "duration": 10
+        },
+        {
+          "fullName": "formatDate should handle invalid input",
+          "title": "should handle invalid input",
+          "status": "failed",
+          "duration": 5,
+          "failureMessages": ["Expected '2026-07-14' but received '2026-07-13'"]
+        },
+        {
+          "fullName": "formatCurrency should format USD",
+          "title": "should format USD",
+          "status": "passed",
+          "duration": 8
+        }
+      ]
+    },
+    {
+      "name": "utils/string.test.js",
+      "duration": 180,
+      "assertionResults": [
+        {
+          "fullName": "capitalize should capitalize first letter",
+          "title": "should capitalize first letter",
+          "status": "passed",
+          "duration": 3
+        },
+        {
+          "fullName": "capitalize should handle empty string",
+          "title": "should handle empty string",
+          "status": "skipped",
+          "duration": 0
+        }
+      ]
+    }
+  ]
+}
