@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="unit-tests" tests="5" failures="1" errors="0" skipped="1" time="2.5">
+    <testcase name="test_login_success" classname="auth.spec" time="0.5"/>
+    <testcase name="test_login_failure" classname="auth.spec" time="0.4">
+      <failure message="Expected 200 but got 401">AssertionError: Expected 200 but got 401</failure>
+    </testcase>
+    <testcase name="test_logout" classname="auth.spec" time="0.3"/>
+    <testcase name="test_session_timeout" classname="session.spec" time="0.8"/>
+    <testcase name="test_token_refresh" classname="session.spec" time="0.5">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,28 @@
+{
+  "success": false,
+  "numTotalTests": 3,
+  "numPassedTests": 2,
+  "numFailedTests": 1,
+  "numPendingTests": 0,
+  "testResults": [
+    {
+      "name": "src/components/Login.test.tsx",
+      "status": "passed",
+      "duration": 0.15,
+      "message": "",
+      "assertionResults": [
+        {"name": "should render login form", "status": "passed", "duration": 0.08},
+        {"name": "should handle input change", "status": "passed", "duration": 0.07}
+      ]
+    },
+    {
+      "name": "src/api/auth.test.ts",
+      "status": "failed",
+      "duration": 0.12,
+      "message": "Expected 'admin' but received 'user'",
+      "assertionResults": [
+        {"name": "should authenticate user", "status": "failed", "duration": 0.12, "failureMessages": ["Expected 'admin' but received 'user'"]}
+      ]
+    }
+  ]
+}
