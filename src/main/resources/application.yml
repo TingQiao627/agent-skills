@@ -1,0 +1,49 @@
+# JWT Configuration
+jwt:
+  # JWT签名密钥（生产环境应使用环境变量或密钥管理服务）
+  secret: ${JWT_SECRET:your-256-bit-secret-key-for-jwt-signing-must-be-long-enough-for-hs256}
+  
+  # Access Token过期时间（毫秒）：默认15分钟
+  access-token-expiration: 900000
+  
+  # Refresh Token过期时间（毫秒）：默认7天
+  refresh-token-expiration: 604800000
+  
+  # Token前缀
+  token-prefix: "Bearer "
+  
+  # Token请求头名称
+  header: Authorization
+  
+  # Access Token过期前多久开始静默刷新（毫秒）：默认5分钟
+  refresh-before-expiration: 300000
+  
+  # Redis中的key前缀
+  refresh-token-key-prefix: "jwt:refresh:"
+  blacklist-key-prefix: "jwt:blacklist:"
+
+# Spring Configuration
+spring:
+  application:
+    name: jwt-session-management
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# Logging Configuration
+logging:
+  level:
+    com.session: DEBUG
+    org.springframework.security: INFO
