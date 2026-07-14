@@ -1,0 +1,17 @@
+{
+  "name": "test-report-generator",
+  "version": "1.0.0",
+  "description": "测试报告生成器",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/index.js --parse examples/sample-jest.json --output reports/"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.0.0"
+  }
+}

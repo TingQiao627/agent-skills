@@ -1,0 +1,63 @@
+{
+  "success": false,
+  "numTotalTests": 5,
+  "numPassedTests": 3,
+  "numFailedTests": 1,
+  "numPendingTests": 1,
+  "numTodoTests": 0,
+  "startTime": 1724000000000,
+  "testResults": [
+    {
+      "name": "/src/user.test.ts",
+      "status": "failed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["UserService"],
+          "fullName": "UserService should create user",
+          "status": "passed",
+          "title": "should create user",
+          "duration": 45
+        },
+        {
+          "ancestorTitles": ["UserService"],
+          "fullName": "UserService should delete user",
+          "status": "failed",
+          "title": "should delete user",
+          "duration": 12,
+          "failureMessages": ["Error: User not found\n    at UserService.delete (src/user.ts:25)"]
+        },
+        {
+          "ancestorTitles": ["UserService"],
+          "fullName": "UserService should update user",
+          "status": "passed",
+          "title": "should update user",
+          "duration": 38
+        }
+      ],
+      "startTime": 1724000000100,
+      "endTime": 1724000001195
+    },
+    {
+      "name": "/src/auth.test.ts",
+      "status": "passed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["AuthService"],
+          "fullName": "AuthService should login",
+          "status": "passed",
+          "title": "should login",
+          "duration": 150
+        },
+        {
+          "ancestorTitles": ["AuthService"],
+          "fullName": "AuthService should logout",
+          "status": "pending",
+          "title": "should logout",
+          "duration": 0
+        }
+      ],
+      "startTime": 1724000000200,
+      "endTime": 1724000002350
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "success": true,
+  "startTime": 1720936800000,
+  "numTotalTests": 5,
+  "numPassedTests": 3,
+  "numFailedTests": 1,
+  "numPendingTests": 1,
+  "testResults": [
+    {
+      "name": "src/__tests__/auth.test.ts",
+      "status": "passed",
+      "startTime": 1720936800000,
+      "endTime": 1720936805000,
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Auth Module"],
+          "fullName": "Auth Module 登录成功测试",
+          "status": "passed",
+          "title": "登录成功测试",
+          "duration": 150
+        },
+        {
+          "ancestorTitles": ["Auth Module"],
+          "fullName": "Auth Module 用户信息验证",
+          "status": "passed",
+          "title": "用户信息验证",
+          "duration": 80
+        }
+      ]
+    },
+    {
+      "name": "src/__tests__/order.test.ts",
+      "status": "failed",
+      "startTime": 1720936805000,
+      "endTime": 1720936810000,
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Order Module"],
+          "fullName": "Order Module 订单创建测试",
+          "status": "passed",
+          "title": "订单创建测试",
+          "duration": 200
+        },
+        {
+          "ancestorTitles": ["Order Module"],
+          "fullName": "Order Module 支付超时测试",
+          "status": "failed",
+          "title": "支付超时测试",
+          "duration": 5000,
+          "failureMessages": [
+            "Error: Timeout exceeded 5000ms\n    at TimeoutCallback._onTimeout (node:internal/timers:568:17)\n    at listOnTimeout (node:internal/timers:514:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "src/__tests__/user.test.ts",
+      "status": "pending",
+      "startTime": 1720936810000,
+      "endTime": 1720936810000,
+      "assertionResults": [
+        {
+          "ancestorTitles": ["User Module"],
+          "fullName": "User Module 用户注册流程",
+          "status": "pending",
+          "title": "用户注册流程",
+          "duration": 0
+        }
+      ]
+    }
+  ]
+}

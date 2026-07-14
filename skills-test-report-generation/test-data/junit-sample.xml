@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="pytest" tests="4" failures="1" errors="0" time="0.523">
+  <testsuite name="tests/test_user.py" tests="4" failures="1" errors="0" time="0.523">
+    <testcase name="test_create_user" classname="tests.test_user" time="0.123"/>
+    <testcase name="test_delete_user" classname="tests.test_user" time="0.001">
+      <failure message="AssertionError: User not found">
+        <![CDATA[Traceback (most recent call last):
+  File "tests/test_user.py", line 25, in test_delete_user
+    assert user is not None
+AssertionError: User not found]]>
+      </failure>
+    </testcase>
+    <testcase name="test_update_user" classname="tests.test_user" time="0.089"/>
+    <testcase name="test_get_user" classname="tests.test_user" time="0.310"/>
+  </testsuite>
+</testsuites>
