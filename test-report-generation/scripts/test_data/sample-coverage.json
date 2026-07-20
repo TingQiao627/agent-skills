@@ -1,0 +1,20 @@
+{
+  "total": {
+    "lines": {"total": 520, "covered": 416, "skipped": 0, "pct": 80.0},
+    "statements": {"total": 580, "covered": 464, "skipped": 0, "pct": 80.0},
+    "functions": {"total": 120, "covered": 90, "skipped": 0, "pct": 75.0},
+    "branches": {"total": 80, "covered": 52, "skipped": 0, "pct": 65.0}
+  },
+  "src/utils.ts": {
+    "lines": {"total": 100, "covered": 95, "skipped": 0, "pct": 95.0}
+  },
+  "src/api.ts": {
+    "lines": {"total": 200, "covered": 180, "skipped": 0, "pct": 90.0}
+  },
+  "src/auth.ts": {
+    "lines": {"total": 150, "covered": 60, "skipped": 0, "pct": 40.0}
+  },
+  "src/legacy/old-parser.ts": {
+    "lines": {"total": 70, "covered": 21, "skipped": 0, "pct": 30.0}
+  }
+}

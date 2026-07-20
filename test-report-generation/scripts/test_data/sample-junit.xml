@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="10" failures="2" errors="0" time="2.345">
+  <testsuite name="src/utils.test.ts" file="src/utils.test.ts" tests="4" failures="0" errors="0" skipped="1" time="0.856">
+    <testcase name="should add two numbers" classname="MathUtils" file="src/utils.test.ts" time="0.123" />
+    <testcase name="should subtract two numbers" classname="MathUtils" file="src/utils.test.ts" time="0.089" />
+    <testcase name="should multiply two numbers" classname="MathUtils" file="src/utils.test.ts" time="0.105" />
+    <testcase name="should handle division by zero" classname="MathUtils" file="src/utils.test.ts" time="0.000">
+      <skipped message="Not implemented yet" />
+    </testcase>
+  </testsuite>
+  <testsuite name="src/api.test.ts" file="src/api.test.ts" tests="3" failures="1" errors="0" skipped="0" time="0.912">
+    <testcase name="should fetch user data" classname="API" file="src/api.test.ts" time="0.234" />
+    <testcase name="should return 404 for missing user" classname="API" file="src/api.test.ts" time="0.156">
+      <failure message="Expected status 404, got 500">
+        Error: Expected status 404, got 500
+            at Object.&lt;anonymous&gt; (src/api.test.ts:42:15)
+            at Promise.then.completed (node_modules/jest-circus/build/utils.js:298:28)
+            at new Promise (&lt;anonymous&gt;)
+            at callAsyncCircusFn (node_modules/jest-circus/build/utils.js:231:10)
+            at _callCircusTest (node_modules/jest-circus/build/run.js:316:40)
+            at processTicksAndRejections (node:internal/process/task_queues:95:5)
+            at _runTest (node_modules/jest-circus/build/run.js:252:3)
+            at _runTestsForDescribeBlock (node_modules/jest-circus/build/run.js:126:9)
+            at _runTestsForDescribeBlock (node_modules/jest-circus/build/run.js:121:9)
+            at run (node_modules/jest-circus/build/run.js:71:3)
+      </failure>
+    </testcase>
+    <testcase name="should update user profile" classname="API" file="src/api.test.ts" time="0.312" />
+  </testsuite>
+  <testsuite name="src/auth.test.ts" file="src/auth.test.ts" tests="3" failures="1" errors="0" skipped="0" time="0.577">
+    <testcase name="should authenticate valid user" classname="Auth" file="src/auth.test.ts" time="0.145" />
+    <testcase name="should reject invalid token" classname="Auth" file="src/auth.test.ts" time="0.089">
+      <failure message="Token validation failed: expired">
+        Token validation failed: expired
+            at Auth.validateToken (src/auth.ts:56:11)
+            at Object.&lt;anonymous&gt; (src/auth.test.ts:28:20)
+      </failure>
+    </testcase>
+    <testcase name="should refresh token" classname="Auth" file="src/auth.test.ts" time="0.201" />
+  </testsuite>
+</testsuites>
