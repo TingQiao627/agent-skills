@@ -11,6 +11,9 @@ public class HelloWorld {
     /** 默认问候语 */
     private static final String DEFAULT_GREETING = "Hello, World!";
 
+    /** 中文默认问候语 */
+    private static final String DEFAULT_CHINESE_GREETING = "你好，世界！";
+
     /**
      * 获取默认问候语。
      *
@@ -18,6 +21,37 @@ public class HelloWorld {
      */
     public String getGreeting() {
         return DEFAULT_GREETING;
+    }
+
+    /**
+     * 获取中文默认问候语。
+     *
+     * @return 中文问候语字符串
+     */
+    public String getChineseGreeting() {
+        return DEFAULT_CHINESE_GREETING;
+    }
+
+    /**
+     * 获取指向指定对象的问候语。
+     *
+     * @param name 被问候的对象名称
+     * @return 包含对象名称的问候语字符串
+     */
+    public String getGreeting(String name) {
+        String target = (name == null || name.isBlank()) ? "World" : name.trim();
+        return "Hello, " + target + "!";
+    }
+
+    /**
+     * 获取指向指定对象的中文问候语。
+     *
+     * @param name 被问候的对象名称
+     * @return 包含对象名称的中文问候语字符串
+     */
+    public String getChineseGreeting(String name) {
+        String target = (name == null || name.isBlank()) ? "世界" : name.trim();
+        return "你好，" + target + "！";
     }
 
     /**
