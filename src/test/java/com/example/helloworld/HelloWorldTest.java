@@ -30,6 +30,78 @@ class HelloWorldTest {
         assertThat(greeting).isEqualTo("Hello, World!");
     }
 
+    // ==================== getChineseGreeting 测试 ====================
+
+    @Test
+    @DisplayName("调用 getChineseGreeting 应返回 你好，世界！")
+    void should_returnChineseGreeting_when_called() {
+        // Arrange
+        HelloWorld helloWorld = new HelloWorld();
+
+        // Act
+        String greeting = helloWorld.getChineseGreeting();
+
+        // Assert
+        assertThat(greeting).isNotNull();
+        assertThat(greeting).isEqualTo("你好，世界！");
+    }
+
+    // ==================== getGreeting(name) 测试 ====================
+
+    @Test
+    @DisplayName("传入名称调用 getGreeting 应返回包含该名称的问候语")
+    void should_returnNamedGreeting_when_nameProvided() {
+        // Arrange
+        HelloWorld helloWorld = new HelloWorld();
+
+        // Act
+        String greeting = helloWorld.getGreeting("Alice");
+
+        // Assert
+        assertThat(greeting).isEqualTo("Hello, Alice!");
+    }
+
+    @Test
+    @DisplayName("传入空名称调用 getGreeting 应默认问候 World")
+    void should_returnDefaultGreeting_when_nameBlank() {
+        // Arrange
+        HelloWorld helloWorld = new HelloWorld();
+
+        // Act
+        String greeting = helloWorld.getGreeting("   ");
+
+        // Assert
+        assertThat(greeting).isEqualTo("Hello, World!");
+    }
+
+    // ==================== getChineseGreeting(name) 测试 ====================
+
+    @Test
+    @DisplayName("传入名称调用 getChineseGreeting 应返回包含该名称的中文问候语")
+    void should_returnNamedChineseGreeting_when_nameProvided() {
+        // Arrange
+        HelloWorld helloWorld = new HelloWorld();
+
+        // Act
+        String greeting = helloWorld.getChineseGreeting("小明");
+
+        // Assert
+        assertThat(greeting).isEqualTo("你好，小明！");
+    }
+
+    @Test
+    @DisplayName("传入空名称调用 getChineseGreeting 应默认问候 世界")
+    void should_returnDefaultChineseGreeting_when_nameBlank() {
+        // Arrange
+        HelloWorld helloWorld = new HelloWorld();
+
+        // Act
+        String greeting = helloWorld.getChineseGreeting(null);
+
+        // Assert
+        assertThat(greeting).isEqualTo("你好，世界！");
+    }
+
     // ==================== main 测试 ====================
 
     @Test
