@@ -32,4 +32,10 @@ public class HelloWorldServiceImpl implements HelloWorldService {
         String message = "Hello, " + displayName + "!";
         return new HelloWorldResponse(message, LocalDateTime.now());
     }
+
+    @Override
+    public HelloWorldResponse greetDt() {
+        LOGGER.info("Generating dt greeting");
+        return new HelloWorldResponse("Hello, dt!", LocalDateTime.now());
+    }
 }

@@ -32,4 +32,14 @@ public class HelloWorldController {
     public HelloWorldResponse greet(@RequestParam(defaultValue = "World") String name) {
         return helloWorldService.greet(name);
     }
+
+    /**
+     * dt 问候接口。
+     *
+     * @return dt 问候响应
+     */
+    @GetMapping("/dt")
+    public HelloWorldResponse greetDt() {
+        return helloWorldService.greetDt();
+    }
 }
