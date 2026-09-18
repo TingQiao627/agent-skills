@@ -73,4 +73,16 @@ class HelloWorldServiceImplTest {
         assertThrows(IllegalArgumentException.class,
                 () -> helloWorldService.greet(null));
     }
+
+    // ──────────────────────────── greetDt ────────────────────────────
+
+    @Test
+    @DisplayName("greetDt：应返回固定 dt 问候消息并包含时间戳")
+    void shouldReturnDtGreeting() {
+        HelloWorldResponse response = helloWorldService.greetDt();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getMessage()).isEqualTo("Hello, dt!");
+        assertThat(response.getTimestamp()).isNotNull();
+    }
 }

@@ -17,4 +17,11 @@ public interface HelloWorldService {
      * @throws IllegalArgumentException 当 name 为 null 时抛出
      */
     HelloWorldResponse greet(String name);
+
+    /**
+     * 生成固定的 dt 问候消息。
+     *
+     * @return 包含 "Hello, dt!" 消息的问候响应对象
+     */
+    HelloWorldResponse greetDt();
 }

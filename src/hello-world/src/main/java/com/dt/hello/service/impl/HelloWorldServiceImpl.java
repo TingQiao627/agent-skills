@@ -4,6 +4,7 @@ import com.dt.hello.model.vo.HelloWorldResponse;
 import com.dt.hello.service.HelloWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  *
  * @author dtcoder
  */
+@Service
 public class HelloWorldServiceImpl implements HelloWorldService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelloWorldServiceImpl.class);
@@ -31,5 +33,11 @@ public class HelloWorldServiceImpl implements HelloWorldService {
 
         String message = "Hello, " + displayName + "!";
         return new HelloWorldResponse(message, LocalDateTime.now());
+    }
+
+    @Override
+    public HelloWorldResponse greetDt() {
+        LOGGER.info("Generating dt greeting");
+        return new HelloWorldResponse("Hello, dt!", LocalDateTime.now());
     }
 }
